@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THA PDF Grade Extractor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="config-form" class="grade-form">
+        <h3>Settings</h3>
+        <div>
+            <label for="ln-sum" title="Maximum ECTS points from mandatory electives (Wahlpflichtfächer)">Mandatory Electives Limit (ECTS):</label>
+            <input type="number" id="ln-sum" value="25" min="0" step="1">
+            <button id="update-ln-sum">Update</button>
+            <small>Maximum ECTS points that can be earned through mandatory electives (Wahlpflichtfächer)</small>
+        </div>
+    </div>
+    <div id="drop-area">
+        <h2>Drag and Drop PDF Here</h2>
+        <input type="file" id="fileElem" accept="application/pdf" style="display:none;">
+        <label for="fileElem">or click to upload</label>
+    </div>
+    <div id="output">
+    </div>
+    <div id="add-grade-form" class="grade-form">
+        <h3>Add Grade</h3>
+        <input type="text" id="new-name" placeholder="Name" required>
+        <select id="new-art" required>
+            <option value="PR">PR</option>
+            <option value="LN">LN</option>
+        </select>
+        <input type="number" id="new-note" placeholder="Note" step="0.1" min="1.0" max="4.0" required>
+        <input type="number" id="new-ects" placeholder="ECTS" min="1" step="1" required>
+        <button id="add-grade-btn">Add Grade</button>
+      </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
