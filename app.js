@@ -27,6 +27,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("add-grade-btn").addEventListener("click", addNewGrade);
     document.getElementById("add-grade-form").style.display = "none";
 
+    const fileElem = document.getElementById('fileElem');
+    fileElem.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type === "application/pdf") {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const typedarray = new Uint8Array(e.target.result);
+                extractTextFromPDF(typedarray);
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            alert("Please upload a valid PDF file.");
+        }
+    });
+
     document.getElementById("update-ln-sum").addEventListener("click", updateLnSum);
     document.getElementById("ln-sum").value = lnSumLimit;
 });
