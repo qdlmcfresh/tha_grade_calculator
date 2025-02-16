@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fileElem.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file && file.type === "application/pdf") {
+            resetTableData(); // Reset before processing new PDF
             const reader = new FileReader();
             reader.onload = function(e) {
                 const typedarray = new Uint8Array(e.target.result);
@@ -72,10 +73,16 @@ function updateLnSum() {
 }
 
 // PDF handling functions from pdfHandler.js
+function resetTableData() {
+    tableData = [];
+    headers = [];
+}
+
 function handleFileUpload(event) {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     if (file && file.type === "application/pdf") {
+        resetTableData(); // Reset before processing new PDF
         const reader = new FileReader();
         reader.onload = function(e) {
             const typedarray = new Uint8Array(e.target.result);
