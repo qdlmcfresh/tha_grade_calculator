@@ -21,7 +21,7 @@ A web application that helps students of Technische Hochschule Augsburg calculat
 
 ## Usage
 
-1. Visit the [THA Grade Calculator](https://qdlmcfresh.github.io/tha_noten/)
+1. Visit the [THA Grade Calculator](https://qdlmcfresh.github.io/tha_grade_calculator/)
 2. Drag and drop your THA grade PDF into the designated area
 3. View your current grades and average
 4. Add potential future grades using the form below the table
