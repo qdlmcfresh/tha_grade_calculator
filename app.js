@@ -53,11 +53,13 @@ function preventDefaults(e) {
 }
 
 function highlight() {
-    dropArea.classList.add('highlight');
+    dropArea.classList.add('border-blue-500');
+    dropArea.classList.add('bg-blue-50');
 }
 
 function unhighlight() {
-    dropArea.classList.remove('highlight');
+    dropArea.classList.remove('border-blue-500');
+    dropArea.classList.remove('bg-blue-50');
 }
 
 function updateLnSum() {
@@ -211,34 +213,43 @@ function calculateWeightedAverage(lnSum = 25){
 function displayTable() {
     const outputArea = document.getElementById("output");
     const table = document.createElement('table');
-    table.className = 'grades-table';
+    table.className = 'min-w-full divide-y divide-gray-200';
     
     const thead = document.createElement('thead');
+    thead.className = 'bg-gray-50';
     const headerRow = document.createElement('tr');
     
     headers.forEach(header => {
         const th = document.createElement('th');
+        th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
         th.textContent = header;
         headerRow.appendChild(th);
     });
     const actionHeader = document.createElement('th');
+    actionHeader.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
     actionHeader.textContent = 'Actions';
     headerRow.appendChild(actionHeader);
     thead.appendChild(headerRow);
     table.appendChild(thead);
     
     const tbody = document.createElement('tbody');
+    tbody.className = 'bg-white divide-y divide-gray-200';
     tableData.forEach((row, index) => {
         const tr = document.createElement('tr');
+        tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        
         Object.values(row).forEach(value => {
             const td = document.createElement('td');
+            td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
             td.textContent = value;
             tr.appendChild(td);
         });
+        
         const actionsTd = document.createElement('td');
+        actionsTd.className = 'px-6 py-4 whitespace-nowrap text-sm';
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '🗑️';
-        deleteBtn.className = 'delete-btn';
+        deleteBtn.className = 'text-red-600 hover:text-red-900';
         deleteBtn.onclick = () => deleteGrade(index);
         actionsTd.appendChild(deleteBtn);
         tr.appendChild(actionsTd);
@@ -246,8 +257,9 @@ function displayTable() {
     });
     table.appendChild(tbody);
 
-    const [average, totalWeight] = calculateWeightedAverage();
+    const [average, totalWeight] = calculateWeightedAverage(lnSumLimit);
     const averageOutput = document.createElement('p');
+    averageOutput.className = 'mt-4 p-4 text-lg font-semibold';
     averageOutput.textContent = `Weighted Average: ${average.toFixed(2)}, Total ECTS: ${totalWeight}`;
     
     outputArea.innerHTML = '';
