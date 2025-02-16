@@ -53,13 +53,13 @@ function preventDefaults(e) {
 }
 
 function highlight() {
-    dropArea.classList.add('border-blue-500');
-    dropArea.classList.add('bg-blue-50');
+    dropArea.classList.add('border-tha');
+    dropArea.classList.add('bg-tha/5');
 }
 
 function unhighlight() {
-    dropArea.classList.remove('border-blue-500');
-    dropArea.classList.remove('bg-blue-50');
+    dropArea.classList.remove('border-tha');
+    dropArea.classList.remove('bg-tha/5');
 }
 
 function updateLnSum() {
@@ -249,7 +249,7 @@ function displayTable() {
         actionsTd.className = 'px-6 py-4 whitespace-nowrap text-sm';
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '🗑️';
-        deleteBtn.className = 'text-red-600 hover:text-red-900';
+        deleteBtn.className = 'text-tha hover:text-tha/80';
         deleteBtn.onclick = () => deleteGrade(index);
         actionsTd.appendChild(deleteBtn);
         tr.appendChild(actionsTd);

@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THA PDF Grade Extractor</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tha: '#FF0350',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
     <div class="max-w-4xl mx-auto space-y-6">
@@ -19,7 +30,7 @@
                     <input type="number" id="ln-sum" value="25" min="0" step="1"
                            class="border rounded px-3 py-2 w-24">
                     <button id="update-ln-sum" 
-                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            class="bg-tha text-white px-4 py-2 rounded hover:bg-tha/80">
                         Update
                     </button>
                 </div>
@@ -28,9 +39,10 @@
         </div>
 
         <div id="drop-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-white">
+            <p class="text-gray-500">Please use the PDF you get from</p> <a href=https://www.verwaltung.fh-augsburg.de>Prüfungsverwaltung</a> <p class="text-gray-500">-> Bescheinigungen -> Notenspiegel </p>
             <h2 class="text-xl font-semibold mb-4">Drag and Drop PDF Here</h2>
             <input type="file" id="fileElem" accept="application/pdf" class="hidden">
-            <label for="fileElem" class="cursor-pointer text-blue-500 hover:text-blue-600">or click to upload</label>
+            <label for="fileElem" class="cursor-pointer text-tha hover:text-tha/80">or click to open</label>
         </div>
 
         <div id="output" class="bg-white rounded-lg shadow-md overflow-x-auto">
@@ -53,7 +65,7 @@
                        class="border rounded px-3 py-2">
             </div>
             <button id="add-grade-btn" 
-                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    class="bg-tha text-white px-4 py-2 rounded hover:bg-tha/80">
                 Add Grade
             </button>
         </div>
