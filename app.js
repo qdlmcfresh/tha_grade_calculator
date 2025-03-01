@@ -95,64 +95,98 @@ function handleFileUpload(event) {
 }
 
 function extractTextFromPDF(typedarray) {
-    pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-        let textContent = "";
-        const numPages = pdf.numPages;
-        const pagePromises = [];
-        let foundPrufNr = false;
-        let foundBearbeiter = false;
+  pdfjsLib
+    .getDocument(typedarray)
+    .promise.then((pdf) => {
+      const textContent = [];
+      const numPages = pdf.numPages;
+      let promiseChain = Promise.resolve();
+      let foundPrufNr = false;
+      let foundBearbeiter = false;
 
-        for (let i = 1; i <= numPages; i++) {
-            pagePromises.push(pdf.getPage(i).then(page => {
-                return page.getTextContent().then(text => {
-                    text.items.forEach(item => {
-                        if (item.str.includes("Prüf.Nr.")) {
-                            foundPrufNr = true;
-                            console.log("Found PrufNr");
-                        }
-                        if (item.str.includes("Bearbeiter")) {
-                            foundBearbeiter = true;
-                            console.log("Found Bearbeiter");
-                        }
-                        if (foundPrufNr && !foundBearbeiter) {
-                            textContent += item.str + "\n";
-                        }
-                    });
+      for (let i = 1; i <= numPages; i++) {
+        promiseChain = promiseChain.then(() =>
+          pdf.getPage(i).then((page) => {
+            return page
+              .getTextContent()
+              .then((text) => {
+                textContent[i] = "";
+                text.items.forEach((item) => {
+                  if (item.str.includes("Prüf.Nr.")) {
+                    foundPrufNr = true;
+                    console.log("Found PrufNr");
+                  }
+                  if (item.str.includes("Bearbeiter")) {
+                    foundBearbeiter = true;
+                    console.log("Found Bearbeiter");
+                  }
+                  if (foundPrufNr && !foundBearbeiter) {
+                    textContent[i] += item.str + "\n";
+                  }
                 });
-            }));
-        }
+              })
+              .then(() => {
+                // handle multiple pages
+                const textItems = textContent[i].split("\n");
+                if (i < numPages) {
+                  // remove footer from first page
+                  textContent[i] = textItems.splice(0, textItems.length - 6);
+                } else {
+                  // remove table header after first page
+                  textContent[i] = textItems.splice(14);
+                }
+                textContent[i] = textContent[i].join("\n");
+              });
+          })
+        );
+      }
 
-        Promise.all(pagePromises).then(() => {
-            getTableData(textContent);
-            displayTable();
-        });
-    }).catch(error => {
-        console.error("Error extracting text from PDF: ", error);
+      promiseChain.then(() => {
+        getTableData(textContent.join("\n"));
+        displayTable();
+      });
+    })
+    .catch((error) => {
+      console.error("Error extracting text from PDF: ", error);
     });
 }
 
 function getTableData(text) {
-    const lines = text.trim().split("\n").filter(line => line.trim() !== "");
-    console.log(lines);
+  const lines = text
+    .trim()
+    .split("\n")
+    .filter((line) => line.trim() !== "");
+  console.log(lines);
 
-    headers = lines.slice(0, 7).map(header => header.trim());
-    const rowData = lines.slice(7);
+  headers = lines.slice(0, 7).map((header) => header.trim());
+  const rows = getRows(lines.slice(7));
 
-    for (let i = 0; i < rowData.length; i += 7) {
-        const row = rowData.slice(i, i + 7);
-        if (row.length === 7) {
-            const obj = {
-                "Nummer": row[0].trim(),
-                "Name": row[1].trim(),
-                "Art": row[2].trim(),
-                "Semester": row[3].trim(),
-                "Note": parseFloat(row[4].replace(",", ".")),
-                "ECTS": parseInt(row[5], 10),
-                "Status": row[6].trim()
-            };
-            tableData.push(obj);
-        }
+  rows.forEach((row) =>
+    tableData.push({
+      Nummer: row[0].trim(),
+      Name: row[1].trim(),
+      Art: row[2].trim(),
+      Semester: row[3].trim(),
+      Note: parseFloat(row[4].replace(",", ".")),
+      ECTS: parseInt(row[5], 10),
+      Status: row[6].trim(),
+    })
+  );
+}
+
+function getRows(rowData) {
+  let rows = [];
+  for (let i = 0; i < rowData.length; i += 7) {
+    const row = rowData.slice(i, i + 7);
+    if (!row[4].includes(",")) {
+      // handle subjects without grades, e.g. "Programmieren 1 (BZV)", "Praktische Tätigkeit", "Praxis-Seminar", ...
+      rows.push([...row.slice(0, 4), "0", ...row.slice(4, 6)]);
+      i--;
+    } else {
+      rows.push(row);
     }
+  }
+  return rows;
 }
 
 function addNewGrade() {
