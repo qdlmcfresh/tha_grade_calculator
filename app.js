@@ -132,46 +132,41 @@ function extractTextFromPDF(typedarray) {
 }
 
 function getTableData(text) {
-    const lines = text.trim().split("\n").filter(line => line.trim() !== "");
-    console.log(lines);
+  const lines = text
+    .trim()
+    .split("\n")
+    .filter((line) => line.trim() !== "");
+  console.log(lines);
 
-    headers = lines.slice(0, 7).map(header => header.trim());
-    const rowData = lines.slice(7);
+  headers = lines.slice(0, 7).map((header) => header.trim());
+  const rows = getRows(lines.slice(7));
 
-    for (let i = 0; i < rowData.length; i += 7) {
-        const row = rowData.slice(i, i + 7);
-        if (row.length === 7) {
-            const obj = {
-                "Nummer": row[0].trim(),
-                "Name": row[1].trim(),
-                "Art": row[2].trim(),
-                "Semester": row[3].trim(),
-                "Note": parseFloat(row[4].replace(",", ".")),
-                "ECTS": parseInt(row[5], 10),
-                "Status": row[6].trim()
-            };
-            tableData.push(obj);
-        }
-    }
+  rows.forEach((row) =>
+    tableData.push({
+      Nummer: row[0].trim(),
+      Name: row[1].trim(),
+      Art: row[2].trim(),
+      Semester: row[3].trim(),
+      Note: parseFloat(row[4].replace(",", ".")),
+      ECTS: parseInt(row[5], 10),
+      Status: row[6].trim(),
+    })
+  );
 }
 
-function addNewGrade() {
-    const newGrade = {
-        "Nummer": -1,
-        "Name": document.getElementById("new-name").value.trim(),
-        "Art": document.getElementById("new-art").value.trim(),
-        "Semester": "Future",
-        "Note": parseFloat(document.getElementById("new-note").value),
-        "ECTS": parseInt(document.getElementById("new-ects").value, 10),
-        "Status": "BE"
-    };
-
-    tableData.push(newGrade);
-    displayTable();
-
-    document.querySelectorAll('#add-grade-form input').forEach(input => {
-        input.value = '';
-    });
+function getRows(rowData) {
+  let rows = [];
+  for (let i = 0; i < rowData.length; i += 7) {
+    const row = rowData.slice(i, i + 7);
+    if (!row[4].includes(",")) {
+      // handle subjects without grades, e.g. "Programmieren 1 (BZV)", "Praktische Tätigkeit", "Praxis-Seminar", ...
+      rows.push([...row.slice(0, 4), "0", ...row.slice(4, 6)]);
+      i--;
+    } else {
+      rows.push(row);
+    }
+  }
+  return rows;
 }
 
 function deleteGrade(index) {
