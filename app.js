@@ -95,39 +95,59 @@ function handleFileUpload(event) {
 }
 
 function extractTextFromPDF(typedarray) {
-    pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-        let textContent = "";
-        const numPages = pdf.numPages;
-        const pagePromises = [];
-        let foundPrufNr = false;
-        let foundBearbeiter = false;
+  pdfjsLib
+    .getDocument(typedarray)
+    .promise.then((pdf) => {
+      const textContent = [];
+      const numPages = pdf.numPages;
+      let promiseChain = Promise.resolve();
+      let foundPrufNr = false;
+      let foundBearbeiter = false;
 
-        for (let i = 1; i <= numPages; i++) {
-            pagePromises.push(pdf.getPage(i).then(page => {
-                return page.getTextContent().then(text => {
-                    text.items.forEach(item => {
-                        if (item.str.includes("Prüf.Nr.")) {
-                            foundPrufNr = true;
-                            console.log("Found PrufNr");
-                        }
-                        if (item.str.includes("Bearbeiter")) {
-                            foundBearbeiter = true;
-                            console.log("Found Bearbeiter");
-                        }
-                        if (foundPrufNr && !foundBearbeiter) {
-                            textContent += item.str + "\n";
-                        }
-                    });
+      for (let i = 1; i <= numPages; i++) {
+        promiseChain = promiseChain.then(() =>
+          pdf.getPage(i).then((page) => {
+            return page
+              .getTextContent()
+              .then((text) => {
+                textContent[i] = "";
+                text.items.forEach((item) => {
+                  if (item.str.includes("Prüf.Nr.")) {
+                    foundPrufNr = true;
+                    console.log("Found PrufNr");
+                  }
+                  if (item.str.includes("Bearbeiter")) {
+                    foundBearbeiter = true;
+                    console.log("Found Bearbeiter");
+                  }
+                  if (foundPrufNr && !foundBearbeiter) {
+                    textContent[i] += item.str + "\n";
+                  }
                 });
-            }));
-        }
+              })
+              .then(() => {
+                // handle multiple pages
+                const textItems = textContent[i].split("\n");
+                if (i < numPages) {
+                  // remove footer from first page
+                  textContent[i] = textItems.splice(0, textItems.length - 6);
+                } else {
+                  // remove table header after first page
+                  textContent[i] = textItems.splice(14);
+                }
+                textContent[i] = textContent[i].join("\n");
+              });
+          })
+        );
+      }
 
-        Promise.all(pagePromises).then(() => {
-            getTableData(textContent);
-            displayTable();
-        });
-    }).catch(error => {
-        console.error("Error extracting text from PDF: ", error);
+      promiseChain.then(() => {
+        getTableData(textContent.join("\n"));
+        displayTable();
+      });
+    })
+    .catch((error) => {
+      console.error("Error extracting text from PDF: ", error);
     });
 }
 
@@ -167,6 +187,25 @@ function getRows(rowData) {
     }
   }
   return rows;
+}
+
+function addNewGrade() {
+    const newGrade = {
+        "Nummer": -1,
+        "Name": document.getElementById("new-name").value.trim(),
+        "Art": document.getElementById("new-art").value.trim(),
+        "Semester": "Future",
+        "Note": parseFloat(document.getElementById("new-note").value),
+        "ECTS": parseInt(document.getElementById("new-ects").value, 10),
+        "Status": "BE"
+    };
+
+    tableData.push(newGrade);
+    displayTable();
+
+    document.querySelectorAll('#add-grade-form input').forEach(input => {
+        input.value = '';
+    });
 }
 
 function deleteGrade(index) {
