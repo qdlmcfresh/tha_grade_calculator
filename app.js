@@ -127,15 +127,17 @@ function extractTextFromPDF(typedarray) {
               })
               .then(() => {
                 // handle multiple pages
-                const textItems = textContent[i].split("\n");
-                if (i < numPages) {
-                  // remove footer from first page
-                  textContent[i] = textItems.splice(0, textItems.length - 6);
-                } else {
-                  // remove table header after first page
-                  textContent[i] = textItems.splice(14);
-                }
-                textContent[i] = textContent[i].join("\n");
+                  if (i > 1) {
+                      const textItems = textContent[i].split("\n");
+                      if (i < numPages) {
+                          // remove footer from first page
+                          textContent[i] = textItems.splice(0, textItems.length - 6);
+                      } else {
+                          // remove table header after first page
+                          textContent[i] = textItems.splice(14);
+                      }
+                      textContent[i] = textContent[i].join("\n");
+                  }
               });
           })
         );
@@ -159,6 +161,7 @@ function getTableData(text) {
   console.log(lines);
 
   headers = lines.slice(0, 7).map((header) => header.trim());
+  console.log(headers);
   const rows = getRows(lines.slice(7));
 
   rows.forEach((row) =>
