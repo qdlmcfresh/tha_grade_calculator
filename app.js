@@ -127,17 +127,16 @@ function extractTextFromPDF(typedarray) {
               })
               .then(() => {
                 // handle multiple pages
-                  if (i > 1) {
-                      const textItems = textContent[i].split("\n");
-                      if (i < numPages) {
-                          // remove footer from first page
-                          textContent[i] = textItems.splice(0, textItems.length - 6);
-                      } else {
-                          // remove table header after first page
-                          textContent[i] = textItems.splice(14);
-                      }
-                      textContent[i] = textContent[i].join("\n");
-                  }
+                const textItems = textContent[i].split("\n");
+                if (i < numPages) {
+                  // remove footer from all pages except last one
+                  textContent[i] = textItems
+                    .splice(0, textItems.length - 6)
+                    .join("\n");
+                } else if (i > 1) {
+                  // remove table header after first page
+                  textContent[i] = textItems.splice(14).join("\n");
+                }
               });
           })
         );
